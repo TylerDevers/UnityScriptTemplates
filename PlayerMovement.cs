@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
     float acceleration;
     private float horizontalInput;
     bool jumping;
-    // bool rightFacing = true;
+    float currentXvelocity;
     
 
 
@@ -32,7 +32,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         camera = Camera.main;
         acceleration = speed * 3;
-
+        
         
     }
 
@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         horizontalInput = Input.GetAxis("Horizontal");
-
+        currentXvelocity = rigidbody.velocity.x;
         Jump();
         AnimatePlayer();
         FlipSprite();
@@ -55,14 +55,13 @@ public class PlayerMovement : MonoBehaviour
         // rigidbody.velocity = new Vector2(horizontalInput * speed, rigidbody.velocity.y);
 
         // use MoveTowards to enable slide when player turns around
-        float currentXvelocity = rigidbody.velocity.x;
+        // float currentXvelocity = rigidbody.velocity.x;
         rigidbody.velocity = new Vector2(Mathf.MoveTowards(currentXvelocity, horizontalInput * speed, acceleration * Time.deltaTime),
              rigidbody.velocity.y);
         
     }
 
     void StayInBoundsOfCamera() {
-        // TODO
         Vector2 position = rigidbody.position;
 
         // prevent mario from moving left
@@ -74,7 +73,6 @@ public class PlayerMovement : MonoBehaviour
 
     bool IsGrounded() {
         
-        // jumpReleased = false;
         bool grounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
         if (grounded) {
             jumping = false;
@@ -105,13 +103,11 @@ public class PlayerMovement : MonoBehaviour
         Vector3 tempScale = transform.localScale;
 
         if (horizontalInput > 0f) {
-            // rightFacing = true;
             tempScale.x = 1f;
             transform.localScale = tempScale;
         }
 
         if (horizontalInput < 0f) {
-            // rightFacing = false;
             tempScale.x = -1f;
             transform.localScale = tempScale;
         }
