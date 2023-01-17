@@ -3,9 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+    for MarioBros-like 2d platformer. 
+    - Player game object has childed empty ground check playerobject , placed at characters feet.
+    - changes player velocity to keep stock unity physics.
+    - rigidbody settings = no drag, gravity of 5.
+*/
 public class PlayerMovement : MonoBehaviour
 {
-
 
     [SerializeField] private new Rigidbody2D rigidbody;
     [SerializeField] private Transform groundCheck;
@@ -24,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
     private void Awake() {
         rigidbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-        acceleration = speed * 2;
+        acceleration = speed * 3;
     }
 
 
@@ -36,13 +41,18 @@ public class PlayerMovement : MonoBehaviour
         AnimatePlayer();
         FlipSprite();
         IsGrounded();
-        print(rigidbody.velocity);
     }
 
 
     private void FixedUpdate()
     {
-        rigidbody.velocity = new Vector2(horizontalInput * speed, rigidbody.velocity.y);
+        // for responsive turn around
+        // rigidbody.velocity = new Vector2(horizontalInput * speed, rigidbody.velocity.y);
+
+        // use MoveTowards to enable slide when player turns around
+        float currentXvelocity = rigidbody.velocity.x;
+        rigidbody.velocity = new Vector2(Mathf.MoveTowards(currentXvelocity, horizontalInput * speed, acceleration * Time.deltaTime),
+             rigidbody.velocity.y);
         
     }
 
@@ -53,6 +63,8 @@ public class PlayerMovement : MonoBehaviour
         bool grounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
         if (grounded) {
             jumping = false;
+        } else {
+            jumping = true;
         }
         return grounded;
     }
@@ -93,26 +105,23 @@ public class PlayerMovement : MonoBehaviour
     void AnimatePlayer() {
 
         if (!jumping) {
-            if (horizontalInput > 0f && rigidbody.velocity.x < 0) {
-                animator.SetBool("Slide", true);
-            }
-            else if (horizontalInput > 0f || horizontalInput < 0f) {
-                animator.SetBool("Run", true);
+            if ((horizontalInput > 0f && rigidbody.velocity.x < 0) || (horizontalInput < 0f && rigidbody.velocity.x > 0)) { // slide left
+                // animator.SetBool("Slide", true);
+                animator.Play("MarioSmallSlide");
+            } else if (horizontalInput > 0f || horizontalInput < 0f) {
+                // animator.SetBool("Run", true);
+                animator.Play("MarioSmallRun");
             } else if (horizontalInput == 0) {
-                animator.SetBool("Run", false);
+                // animator.SetBool("Run", false);
+                animator.Play("MarioSmallIdle");
             }
+        }
 
+        if (jumping) {
+            animator.Play("MarioSmallJump");
         }
         
-
-        
-        if (horizontalInput > 0f && rigidbody.velocity.x < 0f ) {
-            // skid direction
-        }
-
-        if (horizontalInput < 0f && rigidbody.velocity.x > 0f) {
-            // skid other direction
-        }
+    
     }
    
 
