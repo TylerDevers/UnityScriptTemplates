@@ -14,20 +14,18 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] Transform player;
     new Camera camera;
     
-    float cameraXposition;
 
     private void Awake() {
         camera = Camera.main;
-        cameraXposition = player.position.x;
     }
 
 
     private void LateUpdate() {
-        NoBackScroll();
+        FollowNoBackScroll();
     }
 
 
-    void NoBackScroll() {
+    void FollowNoBackScroll() {
         Vector3 cameraPos = camera.transform.position;
 
         cameraPos.x = Mathf.Max(cameraPos.x, player.position.x);
