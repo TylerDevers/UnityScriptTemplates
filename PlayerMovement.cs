@@ -16,12 +16,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
     Animator animator;
+    new Camera camera;
     [SerializeField] private float speed = 8f;
-    [SerializeField] private float jumpingPower = 21f;
+    [SerializeField] private float jumpingPower = 23f;
     float acceleration;
     private float horizontalInput;
     bool jumping;
-    bool rightFacing = true;
+    // bool rightFacing = true;
     
 
 
@@ -29,7 +30,10 @@ public class PlayerMovement : MonoBehaviour
     private void Awake() {
         rigidbody = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        camera = Camera.main;
         acceleration = speed * 3;
+
+        
     }
 
 
@@ -41,6 +45,7 @@ public class PlayerMovement : MonoBehaviour
         AnimatePlayer();
         FlipSprite();
         IsGrounded();
+        StayInBoundsOfCamera();
     }
 
 
@@ -56,6 +61,16 @@ public class PlayerMovement : MonoBehaviour
         
     }
 
+    void StayInBoundsOfCamera() {
+        // TODO
+        Vector2 position = rigidbody.position;
+
+        // prevent mario from moving left
+        Vector2 leftEdge = camera.ScreenToWorldPoint(Vector2.zero);
+        Vector2 rightEdge = camera.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        rigidbody.position = new Vector2(Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x), position.y);
+
+    }
 
     bool IsGrounded() {
         
@@ -90,13 +105,13 @@ public class PlayerMovement : MonoBehaviour
         Vector3 tempScale = transform.localScale;
 
         if (horizontalInput > 0f) {
-            rightFacing = true;
+            // rightFacing = true;
             tempScale.x = 1f;
             transform.localScale = tempScale;
         }
 
         if (horizontalInput < 0f) {
-            rightFacing = false;
+            // rightFacing = false;
             tempScale.x = -1f;
             transform.localScale = tempScale;
         }
@@ -125,9 +140,6 @@ public class PlayerMovement : MonoBehaviour
     }
    
 
-    void StayInBoundsOfCamera() {
-        // TODO
-    }
 
 
 
