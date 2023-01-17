@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+/*
+    uses small proximity sensing gameobject at edge of sprite to sense triggered collisions. 
+*/
+
+
 public class EnemyMovement : MonoBehaviour
 {
     
@@ -16,12 +23,6 @@ public class EnemyMovement : MonoBehaviour
 
     private void Awake() {
         mybody = GetComponent<Rigidbody2D>();
-    }
-
-
-    private void Update() {
-       
-       
     }
 
 
