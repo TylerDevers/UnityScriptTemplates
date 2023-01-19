@@ -16,26 +16,39 @@ public class EnemyMovement : MonoBehaviour
     Rigidbody2D mybody;
     private float walkSpeed = 3f;
     float deltaTimeModifier = 50f;
-    Vector2 direction = Vector2.left;
+    Vector2 direction;
+
     [SerializeField] LayerMask playerLayer;
     [SerializeField] Transform proximitySensor;
 
 
     private void Awake() {
         mybody = GetComponent<Rigidbody2D>();
+        direction = new Vector2(-1, mybody.velocity.y);
+        enabled = false;
     }
 
+    private void OnBecameVisible() {
+        enabled = true;
+    }
+
+    private void OnBecameInvisible() {
+        Destroy(gameObject);
+    }
+
+    private void Update() {
+        
+    }
 
     private void FixedUpdate() {
-        mybody.velocity = direction * walkSpeed * Time.deltaTime * deltaTimeModifier;
+        // mybody.velocity = direction * walkSpeed * Time.deltaTime * deltaTimeModifier;
+        mybody.velocity = new Vector2(direction.x * walkSpeed, mybody.velocity.y) * Time.deltaTime * deltaTimeModifier;
         
     }
 
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Player")) {
-            print("Mario");
-        }
+        
         if (other.gameObject.layer == LayerMask.NameToLayer("Blocks")) {
             ChangeDirection();
         }
@@ -48,14 +61,26 @@ public class EnemyMovement : MonoBehaviour
 
         if (mybody.velocity.x > 0f) {
             tempScale.x = 1f;
-            direction = Vector2.left;
+            direction = new Vector2(-1, mybody.velocity.y);
             transform.localScale = tempScale;
         }
 
         if (mybody.velocity.x < 0f) {
             tempScale.x = -1f;
-            direction = Vector2.right;
+            direction = new Vector2(1, mybody.velocity.y);
             transform.localScale = tempScale;
         }
     }
+
+
+    public void EnemyDeath() {
+        print(gameObject.name);
+        GetComponent<SpriteRenderer>().sortingLayerName = "Death";
+        mybody.velocity += Vector2.up * 10;
+        GetComponent<Collider2D>().enabled = false;
+    }
+
+
+
+
 }

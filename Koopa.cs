@@ -14,6 +14,7 @@ public class Koopa : MonoBehaviour
     SpriteRenderer spriteRenderer;
     [SerializeField] PhysicsMaterial2D bounce;
     bool shelled, shellShot;
+    float direction;
 
     private void Awake() {
         animator = GetComponent<Animator>();
@@ -33,13 +34,15 @@ public class Koopa : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other) {
         if (other.gameObject.tag == "Player") {
             float distanceAbove = (other.transform.position.y - transform.position.y);
-            float direction = (other.transform.position.x - transform.position.x);
+            direction = (other.transform.position.x - transform.position.x);
             if ((distanceAbove) > 0.25f && !shelled) {
                 StartCoroutine(nameof(Shelled));
+            } else if (!shelled) {
+                playerMovement.PlayerDeath();
             }
             if ( shelled ) {
-                ShootShell(direction);
-                // free up velocity for bounce
+                StartCoroutine(nameof(ShootShell));
+                
             } 
         }
         if (shellShot) {
@@ -48,6 +51,7 @@ public class Koopa : MonoBehaviour
             }
             if (other.gameObject.tag == "Enemy") {
                 enemyMovement.EnemyDeath();
+                other.gameObject.GetComponent<EnemyMovement>().EnemyDeath();
             }
         }
     }
@@ -61,12 +65,13 @@ public class Koopa : MonoBehaviour
         shelled = true;
     }
 
-    void ShootShell( float direction){
+    IEnumerator ShootShell(){
         rigidbody2D.velocity = Vector2.left * 1000 * Time.deltaTime * Mathf.Sign(direction);
-
         rigidbody2D.sharedMaterial = bounce;
-        shellShot = true;
         gameObject.layer = LayerMask.NameToLayer("Shell");
+        yield return new WaitForSeconds(0.25f);
+        shellShot = true;
+        
     }
 
 

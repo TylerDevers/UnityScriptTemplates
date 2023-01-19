@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private new Rigidbody2D rigidbody;
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask groundLayer, enemyLayer;
     Animator animator;
     new Camera camera;
     [SerializeField] private float speed = 8f;
@@ -22,8 +22,9 @@ public class PlayerMovement : MonoBehaviour
     float acceleration;
     private float horizontalInput;
     bool jumping;
+    bool isAlive = true;
     float currentXvelocity;
-    
+    float deathFallSpeed = 10f;
 
 
 
@@ -39,13 +40,23 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // for death animation
+        if (!isAlive && rigidbody.velocity.y < 0) {
+            rigidbody.isKinematic = true;
+            rigidbody.velocity = Vector2.down * deathFallSpeed;
+        }
+
         horizontalInput = Input.GetAxis("Horizontal");
         currentXvelocity = rigidbody.velocity.x;
-        Jump();
-        AnimatePlayer();
-        FlipSprite();
-        IsGrounded();
         StayInBoundsOfCamera();
+
+        if (isAlive) {
+            Jump();
+            AnimatePlayer();
+            FlipSprite();
+            IsGrounded();
+        }
+
     }
 
 
@@ -82,8 +93,25 @@ public class PlayerMovement : MonoBehaviour
         return grounded;
     }
 
+    // called from enemy scripts.
+    public void BounceOffEnemy() {
+        rigidbody.velocity += Vector2.up * (jumpingPower / 1.5f);
+        
+    }
+
+    // called from enemy script
+    public void PlayerDeath() {
+        isAlive = false;
+        GetComponent<Collider2D>().enabled = false;
+        animator.Play("MarioSmallDeath");
+        BounceOffEnemy();
+        GetComponent<SpriteRenderer>().sortingLayerName = "Death";
+        
+    }
+
 
     void Jump() {
+
         // full jump press yields full jump
         if (Input.GetButtonDown("Jump") && !jumping)
         {
@@ -117,13 +145,10 @@ public class PlayerMovement : MonoBehaviour
 
         if (!jumping) {
             if ((horizontalInput > 0f && rigidbody.velocity.x < 0) || (horizontalInput < 0f && rigidbody.velocity.x > 0)) { // slide left
-                // animator.SetBool("Slide", true);
                 animator.Play("MarioSmallSlide");
             } else if (horizontalInput > 0f || horizontalInput < 0f) {
-                // animator.SetBool("Run", true);
                 animator.Play("MarioSmallRun");
             } else if (horizontalInput == 0) {
-                // animator.SetBool("Run", false);
                 animator.Play("MarioSmallIdle");
             }
         }
@@ -135,12 +160,6 @@ public class PlayerMovement : MonoBehaviour
     
     }
    
-
-
-
-
-
-
 
 
 
