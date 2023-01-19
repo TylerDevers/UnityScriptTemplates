@@ -19,6 +19,11 @@ public class CameraFollow : MonoBehaviour
         camera = Camera.main;
     }
 
+    private void Update() {
+        if (player == null) {
+            player = FindObjectOfType<PlayerMovement>().gameObject.transform;
+        }
+    }
 
     private void LateUpdate() {
         FollowNoBackScroll();
