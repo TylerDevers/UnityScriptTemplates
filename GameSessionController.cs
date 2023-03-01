@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagment;
+
 
 /*
     use to maintain game state, reset and change levels, GUI, coins, etc.
@@ -17,15 +19,14 @@ public class GameSessionController : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+
+
+    void ResetLevel() {
+        int currentSceneIndex = SceneManagment;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
+
+
+
 }
